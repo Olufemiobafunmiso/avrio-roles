@@ -1,5 +1,6 @@
 "use strict";
 
+
 module.exports = function (sequelize, DataTypes) {
   const roles = sequelize.define('roles', {
     id: {
@@ -27,10 +28,16 @@ module.exports = function (sequelize, DataTypes) {
   }, {
     paranoid: true,
     timestamps: true,
-    underscored: true,
+    // underscored: true,
     classMethods: {
       associate: function (models) {
-        roles.belongsTo(models.users, {foreignKey: 'created_by_id'});
+        // roles.belongsTo(models.users, {foreignKey: 'created_by_id'});
+        // roles.belongsToMany(models.endpoints, {through:'roles_permissions'}); 
+        roles.belongsToMany(models.endpoints, {
+          through: 'roles_endpoints',
+          // foreignKey: 'roles_id',
+          // otherKey:'endpoint_id'
+        });
       }
     }
   });

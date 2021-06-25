@@ -4,7 +4,7 @@
  * @class Options
  */
  module.exports = function (sequelize, DataTypes) {
-  const Endpoints = sequelize.define('endpoints', {
+  const endpoints = sequelize.define('endpoints', {
 
      id: {
         allowNull: false,
@@ -29,9 +29,19 @@
 
    timestamps: true,
    paranoid: false,
-   underscored: true,
-   freezeTableName: true,
+  //  underscored: true,
+  //  freezeTableName: true,
+   classMethods: {
+    associate: function (models) {
+      // .belongsTo(models.users, {foreignKey: 'createrolesd_by_id'});
+      endpoints.belongsToMany(models.roles, {
+        through: 'roles_endpoints',
+        // foreignKey: 'endpoint_id',
+        // otherKey:'roles_id'
+      });
+      }
+  }
 });
 
-  return Endpoints;
+  return endpoints;
 }

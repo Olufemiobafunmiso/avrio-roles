@@ -4,7 +4,7 @@ const Cors = require("cors");
 const app = express();
 const bodyParser = require("body-parser");
 const route = require('./routes')
-
+const db  = require('./db/models')
 
 app.use(bodyParser.json()); 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -19,7 +19,7 @@ app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   next();
 });
-
+// db.sequelize.sync();
  app.use(route)
   
 

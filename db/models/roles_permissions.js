@@ -30,8 +30,8 @@ module.exports = function (sequelize, DataTypes) {
     underscored: true,
     classMethods: {
       associate: function (models) {
-        roles_permissions.belongsTo(models.roles, {foreignKey: 'roles_id'});
-        roles_permissions.belongsTo(models.endpoints,{foreignKey: 'endpoint_id'}); 
+        // roles_permissions.belongsTo(models.roles, {foreignKey: 'roles_id'});
+        // roles_permissions.belongsTo(models.endpoints,{foreignKey: 'endpoint_id'}); 
       }
     }
   });

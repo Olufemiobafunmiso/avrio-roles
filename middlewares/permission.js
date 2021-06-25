@@ -16,7 +16,7 @@ module.exports = async function (req, res, next) {
 	}
     const method = req.method
 
-     console.log({path:path,method:method})
+
     //Users role, findall because user can have more than one role
     const membership = await  models.user_account_maps.findAll({where:{workspace_id:workspace_id,users_id:req.body.user.id}, raw:true});
     // console.log({membership:membership})
@@ -53,6 +53,11 @@ module.exports = async function (req, res, next) {
     const check_other_roles = check_role.map((item)=>{return item.id})
   
     const endpoint_path = await endpoints()
+    if(!endpoint_path){
+        //This means the path does not need permissions
+        next()
+        return;
+    }
 
     const getPath = endpoint_path && endpoint_path.filter((item)=>{
 

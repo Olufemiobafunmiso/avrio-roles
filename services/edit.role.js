@@ -1,7 +1,6 @@
 const joi = require('joi')
 const models = require('../db/models');
 const {Op} = require('sequelize');
-const updateOrCreate = require('../utils/updateOrCreate')
 
 //=======Schema Validation with joi==========//
 
@@ -35,10 +34,20 @@ async function service(data) {
         //   throw new Error('cut')
         // }
         //check if roles exist
-        const isRoleExist = await models.roles.findOne({where:{id:params.role_id, created_by_id:params.role.isOwnerRole[0].users_id},raw:true})
+        const isRoleExist = await models.roles.findOne({where:{id:params.role_id, created_by_id:params.role.isOwnerRole[0].users_id}})
         if(!isRoleExist){
           throw new Error('Role does not exist')
         }
+        if(params.role_name !== isRoleExist.name || params.role_description !==isRoleExist.description){
+          isRoleExist.name = params.role_name
+          isRoleExist.description = params.role_description
+         
+          await isRoleExist.save()
+        }
+        console.log(" params.description", params.description)
+
+        response.name = params.role_name
+        response.description =  params.role_description
         const permIds = Object.keys(params.permissions);
 
          const getAllEndpoints = await models.endpoints.findAll({
@@ -53,66 +62,80 @@ async function service(data) {
           }
           //check permissions
           const check_permissions = await models.roles_permissions.findAll({where: {
-            id: {[Op.in]:permIds},
-            deletedAt:null
+            roles_id: params.role_id,
+            // deletedAt:null,
+           
           },raw:true})
+          const checkDeletedRoles = await models.roles_permissions.findAll({
+            where: {
+              roles_id: params.role_id,
+                 deletedAt: {
+              [Op.ne]: null
+            }
+            },
+            raw: true,
+         
+            paranoid: false
+          })
+          let deletedPermission= checkDeletedRoles.map((item)=>{
+            return item.endpoint_id
+          });
 
-          // console.log(check_permissions,"check_permissions")
- 
-          /**
-           * Sequelize upsert() return `false` is row is updated and `true` if row is created, this is not intuitive for this flow 
-           */
-          
-        //  const update_or_create = await updateOrCreate(models.roles_permissions,{ 
-        //              roles_id:params.role_id,
-        //              endpoint_id:{[Op.in]:permIds}
-        //          })
-        //  const create_role = await models.roles.create({
-        //     name:params.role_name,
-        //     description:params.role_description,
-        //     created_by_id:1
-        // });
-        // console.log({create_rolezzzzzzz:create_role.id})
-  
-//          console.log({create_role:create_role})
          const role_endpoint_data = [];
-         const delete_endpoint =[]
+         const delete_endpoint =[];
+         const restoreDeleted = [];
          let permissionsArr = check_permissions.map((item)=>{
            return item.endpoint_id
          })
     
 
-getAllEndpoints.forEach((endpoint,index)=>{
-          if (params.permissions[endpoint.id] === true && !permissionsArr.includes(endpoint.id) ) {
-              role_endpoint_data.push({
-                roles_id:params.role_id,
-                endpoint_id: endpoint.id
-              }) 
-            }
-            if (params.permissions[endpoint.id] === false && permissionsArr.includes(endpoint.id)) {
-              delete_endpoint.push({
-                roles_id:params.role_id,
-                endpoint_id: endpoint.id,
-                deletedAt:Date.now()
-              }) 
-            }
+        getAllEndpoints.forEach((endpoint, index) => {
 
-})      
-console.log("delete_endpoint",delete_endpoint)
+          //Fresh permissions
+          if (params.permissions[endpoint.id] === true && !permissionsArr.includes(endpoint.id) && !deletedPermission.includes(endpoint.id)) {
+            role_endpoint_data.push({
+              roles_id: params.role_id,
+              endpoint_id: endpoint.id
+            })
+          }
+          //delete old permissions
+          if (params.permissions[endpoint.id] === false && permissionsArr.includes(endpoint.id)) {
+            delete_endpoint.push({
+              roles_id: params.role_id,
+              endpoint_id: endpoint.id
+              // deletedAt: Date.now()
+            })
+          }
+          //restore previous permissions
+          if (params.permissions[endpoint.id] === true && deletedPermission.includes(endpoint.id)) {
+            restoreDeleted.push({
+              roles_id: params.role_id,
+              endpoint_id: endpoint.id
+              // deletedAt: Date.now()
+            })
+          }
+
+        })
+          let restoreRoles;
           let bulkCreate;
           let bulkDelete;
+          if(restoreDeleted.length){
+           let idsRoles =  checkDeletedRoles.map((_id)=>{
+            return _id.roles_id
+           })
+           restoreRoles = await models.roles_permissions.restore({
+              where: {
+                roles_id:{[Op.in]:idsRoles} ,
+                endpoint_id: {[Op.in]:deletedPermission}
+              }
+            });
+          }
           if (role_endpoint_data.length){
-            //  bulkCreate = await roles_permissions.bulkCreate(role_endpoint_data, 
-            //   {
-            //       fields:["roles_id", "endpoint_id"],
-            //       ignoreDuplicates: true,returning:true
-            //   } );
-            bulkCreate = await models.roles_permissions.bulkCreate(role_endpoint_data, { returning: true, attributes:['id']})
+            bulkCreate = await models.roles_permissions.bulkCreate(role_endpoint_data,{ updateOnDuplicate: ["roles_id", "endpoint_id", "createdAt"] }, { returning: true})
           };
           if(delete_endpoint.length){
             roles_ids = delete_endpoint.map((id)=> id.roles_id);
             endpointIds = delete_endpoint.map((id)=> id.endpoint_id);
-            console.log(endpointIds,"roles_ids")
             bulkDelete = await models.roles_permissions.destroy({
               where: {
                 roles_id: {[Op.in]:roles_ids},
@@ -121,14 +144,21 @@ console.log("delete_endpoint",delete_endpoint)
             });
           }
 
-console.log({bulkDelete:bulkDelete})
 
- 
 
-        return check_permissions;
+ const recheck_permissions = await models.roles_permissions.findAll({
+ 	where: {
+ 		roles_id: params.role_id,
+ 		deletedAt: null
+ 	},
+ 	raw: true,
+ 	attributes: ['roles_id', 'endpoint_id']
+ })
+response.permissions = recheck_permissions
+        return response;
 
     } catch (error) {
-      console.log(error)
+
         throw new Error(error);
     }
 }

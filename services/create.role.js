@@ -51,17 +51,15 @@ async function service(data) {
              throw new Error('User already created role');
              
          }
-
+         
          const create_role = await models.roles.create({
             name:params.role_name,
-            description:params.description,
+            description:params.role_description,
             created_by_id:params.user.id
         },{attributes:['id','name','description']});
-       
         response.role_id = create_role.id
         response.name = create_role.name
         response.description = create_role.description || 'N/A'
-//          console.log({create_role:create_role})
          const role_endpoint_data = [];
          let roles_permissions = []
          getAllEndpoints.map(endpoint => {

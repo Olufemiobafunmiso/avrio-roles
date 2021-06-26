@@ -5,7 +5,7 @@ async function service() {
     let response;
     try {
         
-         response  = await models.endpoints.findAll({where:{deleted_at:null},raw:true, attributes:['id','path','description','method'], order: [
+         response  = await models.endpoints.findAll({where:{deletedAt:null},raw:true, attributes:['id','path','description','method'], order: [
             ['id', 'ASC']
         ]})
 

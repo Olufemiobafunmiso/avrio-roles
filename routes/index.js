@@ -25,7 +25,7 @@ router.post('/createworkspaces',userAuth,workspaces);
 router.get('/all/permissions',allPermissions);
 router.post('/v1/manage/roles/create',userAuth,permAuth,createRole);
 router.get('/v1/manage/roles/view/:workspace_id',userAuth,permAuth,viewRoles);
-router.post('/v1/manage/roles/edit/:workspace_id',userAuth,permAuth,editRoles);
+router.put('/v1/manage/roles/edit/:workspace_id',userAuth,permAuth,editRoles);
 
 
 

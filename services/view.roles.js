@@ -35,7 +35,7 @@ async function service(data) {
         return ids.id
     });
     let findRoleName =  findRoles.map((ids)=>{
-        return {id:ids.id,name:ids.name}
+        return {role_id:ids.id,role_name:ids.name}
     });
    
 
@@ -47,8 +47,9 @@ async function service(data) {
         return item.endpoint_id
     });
     // // console.log({endpointids:endpointids})
-    let endpoints_path = [];
+  
     // let 
+    
     const endpoints =  await models.endpoints.findAll({where:{
         id:{[Op.in]:endpointids}
     },raw:true});
@@ -73,9 +74,9 @@ let endpoints_paths= []
     endpoints.map((endpts, index) => {
         findPerms.map((permissions) => {
             findRoleName.map((roles) => {
-                if (permissions.endpoint_id === endpts.id && permissions.roles_id === roles.id) {
+                if (permissions.endpoint_id === endpts.id && permissions.roles_id === roles.role_id) {
                     endpoints_paths.push({
-                        role_name:roles.name,
+                        role_name:roles.role_name,
                         permissions:{path: endpts.path,
                         description: endpts.description}
                     })
@@ -88,11 +89,11 @@ let endpoints_paths= []
 const groupByKey = (list, key) => list.reduce((hash, obj) => ({...hash, [obj[key]]:( hash[obj[key]] || [] ).concat(obj)}), {})
 
  endpoints_paths = groupByKey(endpoints_paths, 'role_name');
- response = endpoints_paths
+response.rolesInfo = findRoleName
+ response.roles_permissions = endpoints_paths
  return response
 
     } catch (error) {
-       console.group(error)
         throw new Error(error);
     }
 }

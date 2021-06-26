@@ -1,7 +1,7 @@
 const joi = require('joi')
 const models = require('../db/models');
 const {Op} = require('sequelize');
-const roles_permissions = require('../db/models/roles_permissions');
+const {groupBy} = require('../utils/multiple.create')
 //=======Schema Validation with joi==========//
 
 const schema = joi.object({
@@ -26,38 +26,73 @@ async function service(data) {
             const message = error.details.map(x => x.message);
             throw new Error(message)
         }
-      const findRoles = await models.roles.findAll({where:{created_by_id:params.user.id, deleted_at:null}, include:{model:models.endpoints},raw:true})
+      const findRoles = await models.roles.findAll({where:{created_by_id:params.user.id, deletedAt:null},raw:true})
         if(!findRoles.length){
             throw new Error('User does not have active custom roles')
         }
 
-    // let findRolesId = findRoles.map((ids)=>{
-    //     return ids.id
-    // });
-    // // console.log({findRolesId:findRolesId})
-    // const findPerms = await models.roles_permissions.findAll({where:{
-    //     roles_id:{[Op.in]:findRolesId}
-    // },raw:true});
-    // // console.log({findPerms:findPerms})
-    // const endpointids = findPerms.map((item)=>{
-    //     return item.endpoint_id
-    // });
-    // // console.log({endpointids:endpointids})
-    // const endpoints =  await models.endpoints.findAll({where:{
-    //     id:{[Op.in]:endpointids}
-    // },raw:true});
-    // // const final_response = findPerms.forEach(element,index => {
-    // //     if(element.endpoint_id === endpointids ){
-    // //         console.log({endpointids:endpointids})
-    // //     }
-    // // });
+    let findRolesId = findRoles.map((ids)=>{
+        return ids.id
+    });
+    let findRoleName =  findRoles.map((ids)=>{
+        return {id:ids.id,name:ids.name}
+    });
+   
 
-    // console.log(final_response)
-        response.roles = findRoles
-        return response;
+    const findPerms = await models.roles_permissions.findAll({where:{
+        roles_id:{[Op.in]:findRolesId}
+    },raw:true});
+    // // console.log({findPerms:findPerms})
+    const endpointids = findPerms.map((item)=>{
+        return item.endpoint_id
+    });
+    // // console.log({endpointids:endpointids})
+    let endpoints_path = [];
+    // let 
+    const endpoints =  await models.endpoints.findAll({where:{
+        id:{[Op.in]:endpointids}
+    },raw:true});
+    // const final_response = findPerms.forEach(element,index => {
+    //     if(element.endpoint_id === endpointids ){
+    //         console.log({endpointids:endpointids})
+    //     }
+    // });
+    // console.log(endpoints,"endpoints")
+    // endpoints.map(endpoints,index=>{
+    //     findPerms.filter((item)=>{
+    //         if(item.endpoint_id === endpoints[index] ){
+    //             console.log({name:endpoints.name,path:endpoints.path,description:endpoints.description})
+    //         }
+    //     })
+    //     // if (permissions[findRolesId] && )
+    //     // console.log("endpoints",endpoints)
+    // })
+
+
+let endpoints_paths= []
+    endpoints.map((endpts, index) => {
+        findPerms.map((permissions) => {
+            findRoleName.map((roles) => {
+                if (permissions.endpoint_id === endpts.id && permissions.roles_id === roles.id) {
+                    endpoints_paths.push({
+                        role_name:roles.name,
+                        permissions:{path: endpts.path,
+                        description: endpts.description}
+                    })
+                }
+            })
+        })
+
+    })
+    // console.log(endpoints_paths)
+const groupByKey = (list, key) => list.reduce((hash, obj) => ({...hash, [obj[key]]:( hash[obj[key]] || [] ).concat(obj)}), {})
+
+ endpoints_paths = groupByKey(endpoints_paths, 'role_name');
+ response = endpoints_paths
+ return response
 
     } catch (error) {
-        // console.log("<<<>?>>>>>>",error)
+       console.group(error)
         throw new Error(error);
     }
 }

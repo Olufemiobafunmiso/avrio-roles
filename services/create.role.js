@@ -44,7 +44,7 @@ async function service(data) {
           //check if role has been created already by the user
         const check_role = await models.roles.findOne({where:{
             name:params.role_name,
-            created_by_id:1
+            created_by_id:params.user.id
         },raw:true})
         // console.log({check_role:check_role})
          if(check_role){
@@ -55,7 +55,7 @@ async function service(data) {
          const create_role = await models.roles.create({
             name:params.role_name,
             description:params.description,
-            created_by_id:1
+            created_by_id:params.user.id
         },{attributes:['id','name','description']});
        
         response.role_id = create_role.id

@@ -10,4 +10,9 @@ const create = async(model,payload)=>{
 return response
 }
 
-module.exports=create
+const groupBy = (xs,f)=>{
+    return xs.reduce((r, v, i, a, k = f(v)) => ((r[k] || (r[k] = [])).push(v), r), {});
+}
+
+
+module.exports={create,groupBy}

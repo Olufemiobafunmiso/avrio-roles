@@ -2,16 +2,15 @@ const joi = require('joi')
 const models = require('../db/models');
 const { uuid } = require('uuidv4');
 const crypto = require("crypto");
-const permissions = require('./all.permissions');
-const createMultiple = require('../utils/multiple.create');
-const create = require('../utils/multiple.create');
+// const permissions = require('./all.permissions');
+// const createMultiple = require('../utils/multiple.create');
+// const create = require('../utils/multiple.create');
 //=======Schema Validation with joi==========//
 
 const schema = joi.object({
     name: joi.string().required(), 
     email: joi.string().email({minDomainSegments: 2}).required(),
     user:joi.alternatives().try(joi.object(), joi.array()).required(),
-    role:joi.alternatives().try(joi.object(), joi.array()).required(),
     
 });
 //============================================//
@@ -41,7 +40,7 @@ async function service(data) {
         //  const createOwnerRole = await models.roles.create({name:'Owner',created_by_id:params.user.id});
         //Owners role is created by the admin and automatically assign to workspace creator, rather than always creating owners role, we can easily assign it to workspace  creator
          const createUserAccountMaps = await models.user_account_maps.create({is_owner:1,users_id:params.user.id,workspace_id:creatWorkspace.id,role_id:1}); //1 is Owner's role
-         const getAllPermissions = await permissions()
+        //  const getAllPermissions = await permissions()
 
 
          /**This is not required since the owners role has access to every permission,

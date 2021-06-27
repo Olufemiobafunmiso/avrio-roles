@@ -29,7 +29,6 @@ module.exports = async function (req, res, next) {
 
        throw new Error('ERROR_RESPONSE_SENT') //Ideally this will not occur if its just FE level, but BE still need to ensure this check is in place.
     };
-// console.log(check_user)
        if (check_user) {
            req.body.user = check_user
          next()

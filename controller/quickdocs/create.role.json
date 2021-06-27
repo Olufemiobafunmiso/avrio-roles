@@ -1,0 +1,52 @@
+{
+    "description": "this permission allows the user to create new roles.",
+    "endpoint": "POST /v1/manage/roles/create",
+    "request_spec": {
+      "type": ["params", "params_query"],
+      "spec": [
+        {"workspace_id":"This is the Workspace id returned when workspace was created.",
+          "email":"This is the email of the user that want's to create a role",
+          "role_name":"This is a custom role name e.g 'contributor' ",
+          "role_description":"This is a short description of the custom role",
+          "permissions":"This is an objects of permissions to be assigned to the custom role. Permissions Id's can be retrieve by calling [GET /all/permissions] endpoint "
+          }
+      ]
+    },
+    "sample_request": {"workspace_id":125,
+      "email":"user@xy.com",
+      "role_name":"Ninjas Team",
+      "role_description":"To manage all accounts",
+      "permissions":{"1":true,"2":true,"3":true}
+      },
+    "sample_response": {
+      "status": "Role and Permissions created.",
+      "data": {
+          "role_id": 17,
+          "name": "Ninjas Team",
+          "description": "To manage all accounts",
+          "permissions": [
+              {
+                  "name": "Ninjas Team",
+                  "path": "/v1/view-audit-log",
+                  "description": "this permission allows the user to read the audit logs\n  of a workspace"
+              },
+              {
+                  "name": "Ninjas Team",
+                  "path": "/v1/workspace/manage",
+                  "description": "this permission allows the user to change the\n  workspace details."
+              },
+              {
+                  "name": "Ninjas Team",
+                  "path": "/v1/workspace/delete",
+                  "description": "this permission allows the user to delete the\n  workspace and all the data associated with."
+              }
+          ]
+      }
+  },
+    "response description":{
+        "role_id":"The id of the new custom role",
+        "description": "The description of the custom role",
+        "permissions": "Array of objects with key properties name, path and description"
+    }
+
+}

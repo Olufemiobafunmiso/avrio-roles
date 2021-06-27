@@ -35,7 +35,7 @@ async function service(data) {
         if(check_user){
             throw new Error('User already exist') //Ideally this will not occur if its just FE level, but BE still need to ensure this check is in place.
         }
-
+        const hashedPassword = await bcrypt.hash(params.password, 10);
         const payload = {
             uuid:uuid(),
             first_name:params.first_name,

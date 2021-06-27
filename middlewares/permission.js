@@ -43,7 +43,7 @@ module.exports = async function (req, res, next) {
        throw new Error('User does not have any role')
 
     }
-//  console.log(check_role,"check_role")
+
     const isOwnerOrEveryone = check_role && check_role.filter((item)=>{
        return item.name ==='owner' || item.name === 'everyone'
     }) 
@@ -68,7 +68,7 @@ module.exports = async function (req, res, next) {
   
 
     //if other roles, then check for permissions
-    console.log(check_other_roles,"check_other_roles",getpath_id)
+
     const check_permission = getpath_id && await models.roles_permissions.findAll({where:{
         roles_id:{[Op.in]:check_other_roles},
         endpoint_id:Number(getpath_id.toString())
@@ -85,7 +85,7 @@ module.exports = async function (req, res, next) {
         next()
     }
     } catch (error) {
-// console.log(error)
+
         res.status(401).json({
             status: "error",
             code: "UNAUTHORIZED_ACCESS",

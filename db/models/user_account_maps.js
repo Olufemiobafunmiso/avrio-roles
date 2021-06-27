@@ -9,7 +9,7 @@ module.exports = function (sequelize, DataTypes) {
     },
     is_owner: {
       type: DataTypes.BOOLEAN,
-      allowNull:false, 
+      allowNull:true, 
       default:0 
     },
     users_id: {

@@ -16,7 +16,7 @@ const schema = joi.object({
 //============================================//
 
 async function service(data) {
-// console.log(data,"#######")
+
     let response = {};
     try {
         // Validate req.body against the defined schema

@@ -1,9 +1,9 @@
-const service = require('../services/edit.role')
+const service = require('../services/assign.role')
 module.exports = async function (req, res, next){
 
 	service(req.body)
 	.then( result => {
-        return res.json({status:'Roles Edit successfully',data: result})
+        return res.json({status:'Role assign successfully',data: result})
          
 	})
 	.catch( err => {

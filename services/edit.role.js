@@ -34,7 +34,14 @@ async function service(data) {
         //   throw new Error('cut')
         // }
         //check if roles exist
-        const isRoleExist = await models.roles.findOne({where:{id:params.role_id, created_by_id:params.role.isOwnerRole[0].users_id}})
+		
+        // const isRoleExist = await models.roles.findOne({where:{id:params.role_id, created_by_id:params.role.isOwnerRole[0].users_id}});
+
+			const isRoleExist = await models.roles.findOne({where:{id:params.role_id,
+				[Op.or]: [{workspaces_id:params.workspace_id}]
+			}});
+
+
         if(!isRoleExist){
           throw new Error('Role does not exist')
         }
@@ -44,7 +51,7 @@ async function service(data) {
          
           await isRoleExist.save()
         }
-        console.log(" params.description", params.description)
+    
 
         response.name = params.role_name
         response.description =  params.role_description
@@ -95,7 +102,8 @@ async function service(data) {
           if (params.permissions[endpoint.id] === true && !permissionsArr.includes(endpoint.id) && !deletedPermission.includes(endpoint.id)) {
             role_endpoint_data.push({
               roles_id: params.role_id,
-              endpoint_id: endpoint.id
+              endpoint_id: endpoint.id,
+							workspaces_id:params.workspace_id
             })
           }
           //delete old permissions

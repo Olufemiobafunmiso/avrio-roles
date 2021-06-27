@@ -17,7 +17,7 @@ const schema = joi.object({
 //============================================//
 
 async function service(data) {
-// console.log(data,"#######")
+
     let response;
     try {
         // Validate req.body against the defined schema
@@ -40,20 +40,24 @@ async function service(data) {
          const creatWorkspace  = await models.workspaces.create(creatWorkspacePayload);
         //  const createOwnerRole = await models.roles.create({name:'Owner',created_by_id:params.user.id});
         //Owners role is created by the admin and automatically assign to workspace creator, rather than always creating owners role, we can easily assign it to workspace  creator
-         const createUserAccountMaps = await models.user_account_maps.create({is_owner:1,users_id:params.user.id,workspace_id:creatWorkspace.id,role_id:1}); //1 is Owners role
+         const createUserAccountMaps = await models.user_account_maps.create({is_owner:1,users_id:params.user.id,workspace_id:creatWorkspace.id,role_id:1}); //1 is Owner's role
          const getAllPermissions = await permissions()
 
-         //create permissions
+
+         /**This is not required since the owners role has access to every permission,
+          * there's therefore no need to create permissions.
+          */
+        //  //create permissions
+        // //  if(getAllPermissions.length){
+        // //     getAllPermissions.forEach (async(element => {
+        // //         await createMultiple(models.roles_permissions,{roles_id:createOwnerRole.id,endpoint_id:element.id})
+        // //     });
+        // //  }
         //  if(getAllPermissions.length){
-        //     getAllPermissions.forEach (async(element => {
-        //         await createMultiple(models.roles_permissions,{roles_id:createOwnerRole.id,endpoint_id:element.id})
-        //     });
+        //     getAllPermissions.forEach (async(element)=>{
+        //     await createMultiple(models.roles_permissions,{roles_id:createOwnerRole.id,endpoint_id:element.id})
+        //     })
         //  }
-         if(getAllPermissions.length){
-            getAllPermissions.forEach (async(element)=>{
-            await createMultiple(models.roles_permissions,{roles_id:createOwnerRole.id,endpoint_id:element.id})
-            })
-         }
         
          response = {
             workspace_id: creatWorkspace.id,

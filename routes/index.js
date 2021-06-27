@@ -16,6 +16,7 @@ const allPermissions = require('../controller/all.permissions');
 const createRole = require('../controller/create.role');
 const viewRoles = require('../controller/roles.view');
 const editRoles = require('../controller/roles.edit');
+const assignRoles = require('../controller/roles.assign');
 
 
 
@@ -26,6 +27,9 @@ router.get('/all/permissions',allPermissions);
 router.post('/v1/manage/roles/create',userAuth,permAuth,createRole);
 router.get('/v1/manage/roles/view/:workspace_id',userAuth,permAuth,viewRoles);
 router.put('/v1/manage/roles/edit/:workspace_id',userAuth,permAuth,editRoles);
+router.post('/v1/workspace/invite',userAuth,permAuth,assignRoles);
+
+
 
 
 

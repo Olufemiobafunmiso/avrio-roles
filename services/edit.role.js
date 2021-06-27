@@ -37,10 +37,7 @@ async function service(data) {
 		
         // const isRoleExist = await models.roles.findOne({where:{id:params.role_id, created_by_id:params.role.isOwnerRole[0].users_id}});
 
-			const isRoleExist = await models.roles.findOne({where:{id:params.role_id,
-				[Op.or]: [{workspaces_id:params.workspace_id}]
-			}});
-
+			const isRoleExist = await models.roles.findByPk(params.role_id);
 
         if(!isRoleExist){
           throw new Error('Role does not exist')

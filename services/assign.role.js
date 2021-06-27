@@ -32,15 +32,7 @@ async function service(data) {
          * Check if role exist  permAuth Middle should have intercept 
          *  this but if for some unseen bugs, it escapes it, then this bit will handle it
          */
-            const isRoleExist = await models.roles.findOne({
-                where: {
-                    id: params.role_id,
-                    [Op.or]: [{
-                        workspaces_id: params.workspace_id
-                    }, ]
-                },
-                raw: true
-            });
+         const isRoleExist = await models.roles.findByPk(params.role_id);
 
     if(!isRoleExist){
         throw new Error('Role does not exist')

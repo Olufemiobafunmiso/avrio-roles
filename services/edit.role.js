@@ -29,13 +29,7 @@ async function service(data) {
             const message = error.details.map(x => x.message);
             throw new Error(message)
         }
-        // console.log(params.role)
-        // if(params){
-        //   throw new Error('cut')
-        // }
-        //check if roles exist
-		
-        // const isRoleExist = await models.roles.findOne({where:{id:params.role_id, created_by_id:params.role.isOwnerRole[0].users_id}});
+       
 
 			const isRoleExist = await models.roles.findByPk(params.role_id);
 
@@ -137,10 +131,10 @@ async function service(data) {
           }
           if (role_endpoint_data.length){
             bulkCreate = await models.roles_permissions.bulkCreate(role_endpoint_data,{ updateOnDuplicate: ["roles_id", "endpoint_id", "createdAt"] }, { returning: true})
-          };
+          }
           if(delete_endpoint.length){
-            roles_ids = delete_endpoint.map((id)=> id.roles_id);
-            endpointIds = delete_endpoint.map((id)=> id.endpoint_id);
+            let roles_ids = delete_endpoint.map((id)=> id.roles_id);
+            let endpointIds = delete_endpoint.map((id)=> id.endpoint_id);
             bulkDelete = await models.roles_permissions.destroy({
               where: {
                 roles_id: {[Op.in]:roles_ids},

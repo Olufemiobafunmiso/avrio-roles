@@ -28,6 +28,7 @@ async function service(data) {
             const message = error.details.map(x => x.message);
             throw new Error(message)
         }
+
         const permIds = Object.keys(params.permissions);
 
          const getAllEndpoints = await models.endpoints.findAll({
@@ -35,7 +36,7 @@ async function service(data) {
               id: {[Op.in]:permIds}
             },raw:true
           });
-        //   console.log(getAllEndpoints)
+
             //check if the permission ids passed are valid
          if(getAllEndpoints.length != permIds.length){
             throw new Error('Invalid permission ID entered')
@@ -46,7 +47,7 @@ async function service(data) {
             name:params.role_name,
             created_by_id:params.user.id
         },raw:true})
-        // console.log({check_role:check_role})
+        
          if(check_role){
              throw new Error('User already created role');
              
@@ -57,9 +58,13 @@ async function service(data) {
             description:params.role_description,
             created_by_id:params.user.id
         },{attributes:['id','name','description']});
+
+
         response.role_id = create_role.id
         response.name = create_role.name
         response.description = create_role.description || 'N/A'
+
+
          const role_endpoint_data = [];
          let roles_permissions = []
          getAllEndpoints.map(endpoint => {

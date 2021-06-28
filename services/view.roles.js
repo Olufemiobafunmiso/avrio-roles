@@ -26,6 +26,7 @@ async function service(data) {
             const message = error.details.map(x => x.message);
             throw new Error(message)
         }
+
       const findRoles = await models.roles.findAll({where:{created_by_id:params.user.id, deletedAt:null},raw:true})
         if(!findRoles.length){
             throw new Error('User does not have active custom roles')
@@ -53,22 +54,13 @@ async function service(data) {
     const endpoints =  await models.endpoints.findAll({where:{
         id:{[Op.in]:endpointids}
     },raw:true});
-    // const final_response = findPerms.forEach(element,index => {
-    //     if(element.endpoint_id === endpointids ){
-    //         console.log({endpointids:endpointids})
-    //     }
-    // });
-    // console.log(endpoints,"endpoints")
-    // endpoints.map(endpoints,index=>{
-    //     findPerms.filter((item)=>{
-    //         if(item.endpoint_id === endpoints[index] ){
-    //             console.log({name:endpoints.name,path:endpoints.path,description:endpoints.description})
-    //         }
-    //     })
-    //     // if (permissions[findRolesId] && )
-    //     // console.log("endpoints",endpoints)
-    // })
-
+   /**
+    * The bottle neck below can be optimized 
+    * by setting up a proper database relationship
+    * so that include:[] can be passed to sequelize
+    * 
+    * 
+    */
 
 let endpoints_paths= []
     endpoints.map((endpts, index) => {

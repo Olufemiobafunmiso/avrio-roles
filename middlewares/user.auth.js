@@ -27,7 +27,7 @@ module.exports = async function (req, res, next) {
 
        if(!check_user){
 
-       throw new Error('ERROR_RESPONSE_SENT') //Ideally this will not occur if its just FE level, but BE still need to ensure this check is in place.
+       throw new Error('User does not exist') //Ideally this will not occur if its just FE level, but BE still need to ensure this check is in place.
     };
        if (check_user) {
            req.body.user = check_user

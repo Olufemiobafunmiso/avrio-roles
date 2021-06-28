@@ -37,9 +37,19 @@ async function service(data) {
     if(!isRoleExist){
         throw new Error('Role does not exist')
       }
+      //check if invitee email exist 
+      const isInviteeValid = await models.users.findOne({where:{email:params.invitee_email},raw:true});
+      if(!isInviteeValid){
+          throw new Error('Invitee email does not exist')
+      }
+      //Check if invitee has been assign role before
+      const isAssign = await models.user_account_maps.findOne({where:{role_id:params.role_id,users_id:isInviteeValid.id}})
 
-      const assign_role  = await models.user_account_maps.create({workspace_id:params.workspace_id,role_id:params.role_id,users_id:params.user.id});
-        response.data = assign_role
+      if(isAssign){
+          throw new Error(`User with email ${params.invitee_email} already has role_id ${params.role_id} on this workspace.`)
+      }
+      const assign_role  = await models.user_account_maps.create({workspace_id:params.workspace_id,role_id:params.role_id,users_id:isInviteeValid.id});
+        response = assign_role
         return response;
 
     } catch (error) {

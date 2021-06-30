@@ -27,7 +27,7 @@ async function service(data) {
             throw new Error(message)
         }
 
-      const findRoles = await models.roles.findAll({where:{created_by_id:params.user.id, deletedAt:null},raw:true})
+      const findRoles = await models.roles.findAll({where:{workspaces_id:params.workspace_id,deletedAt:null},raw:true})
         if(!findRoles.length){
             throw new Error('User does not have active custom roles')
         }

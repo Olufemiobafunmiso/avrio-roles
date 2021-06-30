@@ -2,7 +2,7 @@
     "description": "this permission allows the user to create new roles.",
     "endpoint": "POST /v1/manage/roles/create",
     "request_spec": {
-      "type": ["params", "params_query"],
+      "type": ["params"],
       "spec": [
         {"workspace_id":"This is the Workspace id returned when workspace was created.",
           "email":"This is the email of the user that want's to create a role",

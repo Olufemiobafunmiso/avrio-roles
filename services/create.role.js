@@ -56,7 +56,8 @@ async function service(data) {
          const create_role = await models.roles.create({
             name:params.role_name,
             description:params.role_description,
-            created_by_id:params.user.id
+            created_by_id:params.user.id,
+            workspaces_id:params.workspace_id
         },{attributes:['id','name','description']});
 
 

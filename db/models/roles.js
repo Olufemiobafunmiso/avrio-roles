@@ -18,7 +18,7 @@ module.exports = function (sequelize, DataTypes) {
       },
       workspaces_id: {
         type: DataTypes.INTEGER,
-        allowNull:true,
+        allowNull:false,
         references: {
           model: 'workspaces',
           key: 'id'

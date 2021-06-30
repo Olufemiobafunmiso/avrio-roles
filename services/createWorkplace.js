@@ -31,7 +31,7 @@ async function service(data) {
        const creatWorkspacePayload = {
         uuid:uuid(),
         name:params.name,
-        website:`${params.name.trim()}/workspaces/${crypto.randomBytes(5).toString('hex')}`,
+        website:`/${params.name.trim()}/workspaces/${crypto.randomBytes(5).toString('hex')}`,
         created_by:params.user.id
         }
 
